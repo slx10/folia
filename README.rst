@@ -1,6 +1,10 @@
 Folia
 ===============
 
+.. image:: https://cdn.discordapp.com/attachments/1025771547404812429/1068656478988275723/banner.png
+
+----
+
 Bot made with the aim of facilitating and helping sales, quoting with an inventory system.
 
 It has 5 main features and they are
