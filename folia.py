@@ -20,11 +20,12 @@ class Stock:
         self.price = price
         self.file = config.getConfig()["stockPath"]+self.name.lower()+".json"
 
+    @property
     def exist(self) -> bool:
         return os.path.isfile(self.file)
 
     def create(self) -> dict:
-        if not self.exist():
+        if not self.exist:
             try:
                 stockDict = {"name":self.name,"description":self.description,"amount":self.amount,"price":self.price}
                 with open(self.file,"w") as f:
@@ -35,7 +36,7 @@ class Stock:
         return {"Message":"❌ Already Exist","Status":False}
     
     def display(self) -> dict:
-        if self.exist():
+        if self.exist:
             try:
                 with open(self.file,"r",encoding="utf8") as f:
                     jsonF = json.load(f)
@@ -46,7 +47,7 @@ class Stock:
         return {"Message":"❌ Stock does not exist","Status":False}
 
     def remove(self) -> dict:
-        if self.exist():
+        if self.exist:
             try:
                 with open(self.file,"r",encoding="utf8") as f:
                     jsonF = json.load(f)
@@ -58,7 +59,7 @@ class Stock:
         return {"Message":"❌ Stock does not exist","Status":False}
 
     def edit(self,name,description,amount,price) -> dict:
-        if self.exist():
+        if self.exist:
             try:
                 with open(self.file,"w") as f:
                     stockDict = {"name":name,"description":description,"amount":amount,"price":price}
@@ -138,7 +139,7 @@ async def createStock(ctx,name:str,description:str,amount,price):
         await ctx.send("❌ The amount must be in numbers",ephemeral=True)
         return
     stock = Stock(name,description,int(amount),price)
-    if stock.exist():
+    if stock.exist:
         await ctx.send(stock.create()["Message"],ephemeral=True)
         return
     status = stock.create()
@@ -175,7 +176,7 @@ async def createStock(ctx,name:str,description:str,amount,price):
 )
 async def display(ctx,name):
     stock = Stock(name)
-    if not stock.display()["Status"]:
+    if not stock.exist:
         await ctx.send("❌ No stock found",ephemeral=True)
         return
     stockDict = stock.display()["stock"]
@@ -306,7 +307,7 @@ async def edit(ctx,name):
 async def editStock(ctx,package,name:str,description:str,amount,price):
     stock = Stock(package)
     stockDict = stock.edit(name,description,int(amount),price)
-    if not stockDict["Status"]:
+    if not stock.exist:
         await ctx.send(stockDict["Message"],ephemeral=True)
         return
     edited_embed = interactions.Embed(
@@ -365,7 +366,7 @@ inProcess = {}
 )
 async def announce(ctx,name,channel,mention="",image=""):
     stock = Stock(name)
-    if not stock.exist():
+    if not stock.exist:
         await ctx.send("This stock does not exist | ❌",ephemeral=True)
     stockDict = stock.display()["stock"]
     price = stockDict["price"]
@@ -392,7 +393,6 @@ async def announce(ctx,name,channel,mention="",image=""):
 
 @bot.persistent_component("buy")
 async def buy_response(ctx,package):
-    print(package)
     stock = Stock(package["name"])
     stockDict = stock.display()["stock"]
     name = stockDict["name"]
